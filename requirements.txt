@@ -1,0 +1,35 @@
+thoughts on CCI historical data.
+
+What we need for FALIB CCI is High, low, close for a time slice for each period.
+
+So we currently want 15min bars of h,l,c for 20 periods.  This should be three arrays (h,l,c) with 20 entries in each
+
+Psuedo code
+
+	1 15 min period is complete (0, 15, 30, 45 on the clock starting at 4:00 pm eastern through 9:00 am)
+	2 capture h,l,c arrays for prior 15 min period
+	3 capture h,l,c arrays for prior -1 15 min period
+	4 calculate CCI for period -1 (item 3)
+	5 calculate CCI for period 0 (item 2)
+	6 if we have 0 positions and item 5 > 100 and item 4 <= 100 buy to open 
+	7 if we have 0 positions and item 5 < -100 and item 4 >=-100 sell to open
+	8 if we have +n positions and item 5 < 0 and item 4 > 0 sell to close positions
+	9 if we have -n positions and item 5 > 0 and item 4 <= 0 buy to close positions
+	
+	
+Example assuming it is 30 mins after the hour
+	currentCCI = 16-30 mins time frame
+	priorCCI = 1-15 mins time frame
+	https://interactivebrokers.github.io/tws-api/historical_bars.html#hd_duration&gsc.tab=0
+	tickerId, A unique identifier which will serve to identify the incoming data.
+	contract, The IBApi.Contract you are interested in.
+	endDateTime, The request's end date and time (the empty string indicates current present moment).
+	durationString, The amount of time (or Valid Duration String units) to go back from the request's given end date and time.
+	barSizeSetting, The data's granularity or Valid Bar Sizes
+	whatToShow, The type of data to retrieve. See Historical Data Types
+	useRTH, Whether (1) or not (0) to retrieve data generated only within Regular Trading Hours (RTH). formatDate, The format in which the incoming bars' date should be presented. Note that for day bars, only yyyyMMdd format is available.
+	keepUpToDate, Whether a subscription is made to return updates of unfinished real time bars as they are available (True), or all data is returned on a one-time basis (False). Available starting with API v973.03+ and TWS v965+. If True, and endDateTime cannot be specified.
+
+
+	self.reqHistoricalData(priorCCi, [ES Continuous contract], yyyymmdd hh:14:59:59, "1 D", "15 mins", "TRADES", 1, 1, False, [])
+	
