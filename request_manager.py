@@ -99,12 +99,12 @@ class RequestManager():
             for key, value in subs.items():
                 print("\tID: {}. Name: {}".format(key, value["subscription"][0]))
 
-        print("Streaming Data:")
-        streams = {k: v for k, v in self.data.items() if "price" in v.keys()}
+        print("Streaming Bars:")
+        streams = {k: v for k, v in self.data.items() if "bars" in v.keys()}
         if not streams: print("\tNone")
         else:
             for key, value in streams.items():
-                print("\t{}: {}".format(value["subscription"][0], value["price"]))
+                print("\t{}: {}".format(value["subscription"][0], value["bars"]))
 
         print("Positions:")
         positions = self.logic.account.positions #pylint: disable=no-member

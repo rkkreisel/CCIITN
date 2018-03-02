@@ -1,5 +1,6 @@
 """ IBAPI / CCI ITN Constant Variable Declarations """
 ########## STDLIB IMPORTS ##########
+from collections import namedtuple
 
 ########## CONSTANT DEFINITIONS ##########
 MARKET_DATA_TYPES = {
@@ -12,3 +13,5 @@ MARKET_DATA_TYPES = {
 TICK_TYPES = {
     "LAST_PRICE": 4
 }
+
+BAR = namedtuple("BAR",["Time","High","Low","Close"])

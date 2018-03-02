@@ -1,15 +1,15 @@
 """ Callback Functions from TWS Gateway / Workstation """
 
 ########## STDLIB IMPORTS ##########
-
+from collections import deque
 ########## CUSTOM IMPORTS ##########
 
 from ibapi import wrapper
 from ibapi.utils import iswrapper
 
-from logic import AppLogic
+from logic import AppLogic, calculateCCI
 from logger import getConsole as console
-from constants import TICK_TYPES
+from constants import TICK_TYPES, BAR
 from requests import subscribeAccountPositions
 from contracts import getCurrentFuturesContract
 from orders import logOrder
@@ -90,15 +90,26 @@ class AppWrapper(wrapper.EWrapper):
 
     @iswrapper
     def historicalData(self, reqId, bar):
-        console().info(
-            "Got Historical Data. Date:{}. High:${}. Low:${}".format(bar.date, bar.high, bar.low)
-        )
-        self.client.pushRequestData(reqId, {"historical": {"high": bar.high, "low": bar.low}})
+        if("bars" not in self.client.data[reqId].keys()):
+            self.client.pushRequestData(reqId, {"bars": deque(maxlen=config.TIME_PERIODS)})
+        self.client.data[reqId]["bars"].append(BAR(High=bar.high,Low=bar.low,Close=bar.close,Time=bar.date))
 
+    @iswrapper
+    def historicalDataUpdate(self, reqId, bar):
+        lastBar = self.client.data[reqId]["bars"][-1]
+        newBar = BAR(High=bar.high,Low=bar.low,Close=bar.close,Time=bar.date)
+        if (lastBar.Time == newBar.Time):
+            self.client.data[reqId]["bars"][-1] = newBar
+        else:
+            self.client.data[reqId]["bars"].append(newBar)
+
+        cci = calculateCCI(self.client.data[reqId]["bars"])
+        console().info("Calculated CCI: {}".format(cci))
 
     @iswrapper
     def historicalDataEnd(self, reqId, start, end):
         super().historicalDataEnd(reqId, start, end)
+        console().info("Got CCI Historical Data")
         self.client.finishRequest(reqId)
 
     @iswrapper

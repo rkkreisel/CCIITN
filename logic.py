@@ -3,7 +3,8 @@
 ########## STDLIB IMPORTS ##########
 import threading
 from time import sleep
-
+from talib import CCI
+import numpy as np
 ########## CUSTOM IMPORTS ##########
 from logger import getConsole as console
 from contracts import getContractDetails, updateFuture
@@ -42,7 +43,7 @@ class AppLogic(threading.Thread):
         state = getNewState()
 
         requests.subscribeCCIBars(client, self.future)
-        
+
         while True:
             sleep(.05) # Reduce Processor Load.
             updateFuture(client, self.future)
@@ -59,3 +60,12 @@ def getNewState():
     return {
         "executedToday" : False
     }
+
+def calculateCCI(bars):
+    high = np.array([x.High for x in bars])
+    low = np.array([x.Low for x in bars])
+    close = np.array([x.Close for x in bars])
+    cci = CCI(high, low, close, config.TIME_PERIODS)[19]
+    return cci
+
+    
