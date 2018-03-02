@@ -38,8 +38,9 @@ def getCurrentFuturesContract(contractDetails):
 
 def updateFuture(client, future):
     """ Get New Futures Contracts Every Day"""
-    contractDate = future.tradingHours.split(";")[0].split(":")[0]
-    if contractDate != date.today().strftime("%Y%m%d"):
+    todayHours = future.tradingHours.split(";")[0]
+    tradingDate = [ x.split(":")[0] for x in todayHours.split("-")]
+    if date.today().strftime("%Y%m%d") not in tradingDate:
         getContractDetails(client)
 
 def getBaseContract():

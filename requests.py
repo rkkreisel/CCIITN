@@ -28,5 +28,17 @@ def subscribeAccountPositions(client):
         stopFunc=client.cancelPositions,
         stopArgs=[],
     )
-    
+
+def subscribeCCIBars(client, future):
+    """ Get Historical Bars Used to calculate CCI """
+    console().info("Getting Historical Bars for CCI")
+
+    return client.subscribe(
+        name="Historical Bars",
+        startFunc=client.reqHistoricalData,
+        startArgs=[client.REQUEST_ID, future.summary, "", config.TIME_WINDOW, config.BAR_SIZE, "TRADES", 0, 1, True, []],
+        stopFunc=client.cancelHistoricalData,
+        stopArgs=[client.REQUEST_ID],
+    )
+
 ########## DATA REQUESTS ##########

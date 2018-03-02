@@ -12,6 +12,7 @@ import config
 from constants import MARKET_DATA_TYPES
 from helpers import waitForProp
 from account import Account
+import requests
 
 
 ########## CLASS DEFINITON ##########
@@ -40,6 +41,8 @@ class AppLogic(threading.Thread):
         today = TradingDay(self.future)
         state = getNewState()
 
+        requests.subscribeCCIBars(client, self.future)
+        
         while True:
             sleep(.05) # Reduce Processor Load.
             updateFuture(client, self.future)
